@@ -34,6 +34,6 @@ smiles_input = st.text_input("Enter a SMILES string:", "CCO")
 if st.button("Render Molecule"):
     viewer = render_molecule(smiles_input)
     if viewer:
-        # Use viewer.show() to generate the molecule viewer
-        viewer_html = viewer.show()
+        # Generate HTML and JavaScript for the viewer
+        viewer_html = viewer._make_html()
         st.components.v1.html(viewer_html, height=450)
