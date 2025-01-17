@@ -1,3 +1,6 @@
+pandas
+numpy
+json
 streamlit
-py3dmol
 rdkit
+py3Dmol
