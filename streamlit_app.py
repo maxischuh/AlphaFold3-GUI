@@ -4,16 +4,24 @@ import json
 from seqs import *
 from utils import *
 
-
 def main():
+    """
+    Main function that sets up the AlphaFold3 GUI.
+    It collects user inputs, processes them, and generates JSON for AlphaFold3.
+    """
+    # Setting page configuration for Streamlit
     st.set_page_config(
         page_title="AlphaFold3 GUI",
         layout="centered",
         initial_sidebar_state="auto",
     )
-    st.title("AlphaFold3 GUI")
-    st.write("This app allows you to input data for various entities and generates a structured JSON compatible with AlphaFold 3.")
     
+    # Title and brief explanation for the UI
+    st.title("AlphaFold3 GUI")
+    st.write("This app allows you to input data for various entities and generates a structured JSON compatible with AlphaFold3.")
+    st.write("Use the sections below to specify your job details, entity sequences, and options for covalent binding. "
+             "Covalent binding is handled step-by-step by defining leaving groups and binding sites, which streamlines the process.")
+
     # -- Initialize converter in session_state so it persists across re-runs --
     if "converter" not in st.session_state:
         st.session_state["converter"] = CcdConverter()
@@ -40,6 +48,10 @@ def main():
     # Helper Functions to Generate Input Fields
     # ------------------------------------------------------------------------
     def generate_protein_inputs(count):
+        """
+        Collects protein-specific user input, such as sequences, modifications,
+        and MSA details. Returns a list of ProteinSequence objects.
+        """
         entity_data = []
         for i in range(count):
             num_copies = st.number_input(
@@ -90,6 +102,10 @@ def main():
         return entity_data
 
     def generate_rna_inputs(count):
+        """
+        Collects RNA-specific user input, such as sequences, modifications,
+        and MSA details. Returns a list of RNASequence objects.
+        """
         entity_data = []
         for i in range(count):
             num_copies = st.number_input(
@@ -125,6 +141,10 @@ def main():
         return entity_data
 
     def generate_dna_inputs(count):
+        """
+        Collects DNA-specific user input, such as sequences and modifications.
+        Returns a list of DNASequence objects.
+        """
         entity_data = []
         for i in range(count):
             num_copies = st.number_input(
@@ -155,9 +175,14 @@ def main():
         return entity_data
 
     # ------------------------------------------------------------------------
-    # Reorganized generate_ligand_inputs
+    # Generates user input fields for ligands, including optional covalent binding
     # ------------------------------------------------------------------------
     def generate_ligand_inputs(count):
+        """
+        Collects ligand-specific user input, including SMILES data and,
+        optionally, covalent bond setup. Returns a list of dictionaries containing
+        ligands, bond data, and user-defined CCD data.
+        """
         entity_data = []
 
         # Initialize or get references from st.session_state so we don't lose data on each re-run
@@ -166,7 +191,7 @@ def main():
         if "ligand_userccds" not in st.session_state:
             st.session_state["ligand_userccds"] = {}  # keyed by i
 
-        # Collect all labels for potential binding...
+        # Collect all labels for potential binding
         all_entity_labels = []
         for prot_obj in proteins:
             all_entity_labels.extend([lbl for lbl in prot_obj.id])
@@ -189,7 +214,7 @@ def main():
 
             smiles = st.text_input(f"Ligand SMILES {i+1}", key=f"ligand_smiles_{i}")
 
-            # Render the molecule button
+            # Button to render the molecule visually
             if st.button(f"Render Molecule {i+1}"):
                 viewer_html = st.session_state["converter"].first_step(smiles)
                 if viewer_html:
@@ -201,24 +226,24 @@ def main():
                 key=f"covalent_{i}"
             )
 
+            # If covalent binding is enabled, additional fields for customizing bonds are displayed
             if covalent_bond:
                 st.write("### Covalent Binding Options")
                 with st.expander("Covalent Binding Workflow", expanded=True):
                     if (len(all_entity_labels) > 0) & (count == 1):
-
-                        # --- Tabs for leaving group definition ---
                         tab_define, tab_list = st.tabs(["By Indices", "Full Atom List"])
 
                         with tab_define:
                             st.write("#### Define Leaving Group by Atom Indices")
+                            st.write("Please select the atoms between which the bond should be cleaved.")
                             atom_idx1 = st.number_input(
-                                f"Ligand {i+1}: Atom Index 1", 
-                                min_value=0, step=1, value=0, 
+                                f"Ligand {i+1}: Atom Index 1",
+                                min_value=0, step=1, value=0,
                                 key=f"atom_idx1_{i}"
                             )
                             atom_idx2 = st.number_input(
-                                f"Ligand {i+1}: Atom Index 2", 
-                                min_value=0, step=1, value=1, 
+                                f"Ligand {i+1}: Atom Index 2",
+                                min_value=0, step=1, value=1,
                                 key=f"atom_idx2_{i}"
                             )
 
@@ -229,13 +254,14 @@ def main():
 
                         with tab_list:
                             st.write("#### Define Leaving Group by Listing Atom Indices")
+                            st.write("Please list all atoms which should be cleaved off.")
                             leaving_group_atoms = st.text_input(
                                 f"Leaving Group Atoms (comma-separated) for Ligand {i+1}",
-                                value="", 
+                                value="",
                                 key=f"leaving_group_atoms_{i}"
                             )
                             leaving_group_atoms = [
-                                int(idx.strip()) 
+                                int(idx.strip())
                                 for idx in leaving_group_atoms.split(",") if idx.strip().isdigit()
                             ]
                             if st.button(f"Remove Group from Atom List {i+1}"):
@@ -243,16 +269,14 @@ def main():
                                 if viewer_html:
                                     st.components.v1.html(viewer_html, height=450)
 
-                        # --- Bond details ---
                         st.write("#### Bond Details")
                         st.write("##### Ligand")
-
                         target_atom = st.selectbox(
                             f"Select Atom Index for Ligand {i+1}",
                             st.session_state["converter"].final_labels.values(),
                             key=f"ligand_atom_idx_{i}"
                         )
-                        # Split atom label and index
+                        # Split out label and index
                         target_atom_label = "".join([j for j in target_atom if not j.isdigit()])
                         target_atom_idx = int("".join([j for j in target_atom if j.isdigit()]))
 
@@ -285,8 +309,6 @@ def main():
 
                         if st.button(f"Finalize Covalent Bond {i+1}"):
                             userccd = st.session_state["converter"].fourth_step(entity_labels[0])
-                            
-                            # Create the bond object
                             bond = [
                                 [entity_to_bind, entity_atom_idx, entity_atom_name],
                                 [entity_labels[0], 1, f"{target_atom_label}{target_atom_idx}"]
@@ -304,7 +326,6 @@ def main():
                 bond = None
                 userccd = None
 
-
             # Construct the final data structure for this ligand
             ligand = LigandSequence(
                 id=entity_labels,
@@ -320,9 +341,8 @@ def main():
 
         return entity_data
 
-
     # ------------------------------------------------------------------------
-    # Generate user input fields
+    # Generate user input fields for all entity types
     # ------------------------------------------------------------------------
     st.header("Input Entity Details")
     proteins = generate_protein_inputs(num_proteins)
@@ -345,9 +365,9 @@ def main():
             name=job_name,
             model_seeds=model_seeds,
             sequences=(
-                proteins 
-                + rna 
-                + dna 
+                proteins
+                + rna
+                + dna
                 + [l["ligand"] for l in ligands]  # gather just the 'LigandSequence' parts
             ),
             bonded_atom_pairs=(
@@ -359,10 +379,10 @@ def main():
             )
         ).generate_json()
 
-        # Display JSON in viewer
+        # Display JSON in the app
         st.json(output_json)
 
-        # Provide download option
+        # Provide download option for the generated JSON
         json_string = json.dumps(output_json, indent=4)
         st.download_button(
             label="Download JSON",
