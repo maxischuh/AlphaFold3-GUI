@@ -34,9 +34,10 @@ Alternatively, you can use the publicly accessible webserver: https://alphafold3
 1. Adjust prediction parameters such as proteins, and nucleic acids, ions, and ligands, similar to the AlphaFold3 Webserver.
 2. Unlike the AlphaFold3 Webserver, this interface supports covalent bond generation to any type of ligand, simply by SMILES input.
 3. Additionally, the interface supports editing of covalent ligands by:
-4. Selecting a leaving group via the 3D molecule visualization.
-5. Selecting the target atom using the 3D visualization.
-6. Use the built-in **JSON Generator** to create a JSON file that meets AlphaFold 3's input requirements.
+![AlphaFold3-GUI Screenshot](images/leaving_group_af.jpg)
+5. Selecting a leaving group via the 3D molecule visualization.
+6. Selecting the target atom using the 3D visualization.
+7. Use the built-in **JSON Generator** to create a JSON file that meets AlphaFold 3's input requirements.
 
 ### Step 4: Run Prediction
 1. Once the setup is complete, simply download the .json file, and use it as input for your AlphaFold3 prediction
