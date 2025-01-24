@@ -337,7 +337,7 @@ def main():
             entity_data.append({
                 "ligand": ligand,
                 "bond": bond,
-                "userccd": userccd[0]
+                "userccd": userccd
             })
 
         return entity_data
@@ -375,7 +375,7 @@ def main():
                 [l["bond"] for l in ligands] if num_ligands > 0 else None
             ),
             user_ccd=(
-                [l["userccd"] for l in ligands if l["userccd"] is not None]
+                [l["userccd"] for l in ligands if l["userccd"] is not None][0]
                 if num_ligands > 0 else None
             )
         ).generate_json()
