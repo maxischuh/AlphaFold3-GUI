@@ -248,7 +248,7 @@ def main():
                             )
 
                             if st.button(f"Split Bond at Indices for Ligand {i+1}"):
-                                leaving_group atoms, viewer_html = st.session_state["converter"].second_step(atom_idx1, atom_idx2)
+                                leaving_group_atoms, viewer_html = st.session_state["converter"].second_step(atom_idx1, atom_idx2)
                                 if viewer_html:
                                     st.components.v1.html(viewer_html, height=450)
                                 viewer_html = st.session_state["converter"].third_step(leaving_group_atoms)                                
