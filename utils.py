@@ -28,7 +28,7 @@ class JSONGenerator:
         _filter_empty(data):
             Recursively filters out empty values from the provided data.
     """
-    def __init__(self, name, model_seeds, sequences, bonded_atom_pairs=None, user_ccd=None, dialect="alphafold3", version=2):
+    def __init__(self, name, model_seeds, sequences, bonded_atom_pairs=None, user_ccd=None, dialect="alphafold3", version=1):
         self.name = name
         self.model_seeds = model_seeds
         self.sequences = sequences
