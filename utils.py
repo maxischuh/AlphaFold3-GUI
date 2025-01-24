@@ -225,9 +225,8 @@ class CcdConverter:
         )
 
     def third_step(self, leaving_group_atoms):
-        final_mol = self.remove_atoms(self.mol, leaving_group_atoms)
+        final_mol = self.remove_atoms(self.final_mol, leaving_group_atoms)
         final_labels = self.generate_atom_labels(final_mol)
-        final_mol = self.mol
         self.final_mol = final_mol
         self.final_labels = final_labels
         return self.visualize_molecule(final_mol, final_labels)
