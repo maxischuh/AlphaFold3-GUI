@@ -220,7 +220,7 @@ class CcdConverter:
         updated_labels = self.generate_atom_labels(updated_mol)  # Use updated molecule for visualization
         self.final_mol = updated_mol
         self.final_labels = updated_labels
-        return self.visualize_molecule(
+        return leaving_group_atoms, self.visualize_molecule(
             updated_mol, updated_labels, highlight_atom_idx=leaving_group_atoms
         )
 
