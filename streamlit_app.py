@@ -337,7 +337,7 @@ def main():
             entity_data.append({
                 "ligand": ligand,
                 "bond": bond,
-                "userccd": userccd
+                "userccd": userccd[0]
             })
 
         return entity_data
